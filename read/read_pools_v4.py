@@ -27,10 +27,12 @@ def get_pool(ip):
                 if ('RANGE' or 'NET') in pool:
                     line = re.findall(r'(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+.*', pool)
                     try:
-                        prefix = ipaddress.IPv4Network(f"{line[0][2]}/{line[0][3]}")
+                        prefix = ipaddress.IPv4Network(f'{line[0][2]}/{line[0][3]}')
+                    except ipaddress.AddressValueError:
+                        prefix = "None"
                     except ipaddress.NetmaskValueError:
-                        prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address({line[0][2]}),
-                                                                        ipaddress.IPv4Address({line[0][3]})))[0]
+                        prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address(line[0][2]),
+                                                                        ipaddress.IPv4Address(line[0][3])))[0]
                     gipools.append({"device": "",
                                     "context": "Gi",
                                     "name": name,
@@ -47,11 +49,12 @@ def get_pool(ip):
                 if ('RANGE' or 'NET') in pool:
                     line = re.findall(r'(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+.*', pool)
                     try:
-                        prefix = ipaddress.IPv4Network(f"{line[0][2]}/{line[0][3]}")
+                        prefix = ipaddress.IPv4Network(f'{line[0][2]}/{line[0][3]}')
+                    except ipaddress.AddressValueError:
+                        prefix = "None"
                     except ipaddress.NetmaskValueError:
-                        # prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address(line[0][2]),
-                        # ipaddress.IPv4Address(line[0][3])))[0]
-                        prefix = None
+                        prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address(line[0][2]),
+                                                                        ipaddress.IPv4Address(line[0][3])))[0]
 
                     sgpools.append({"device": "",
                                     "context": "SG",
