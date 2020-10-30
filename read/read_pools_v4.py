@@ -49,8 +49,10 @@ def get_pool(ip):
                     try:
                         prefix = ipaddress.IPv4Network(f"{line[0][2]}/{line[0][3]}")
                     except ipaddress.NetmaskValueError:
-                        prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address(line[0][2]),
-                                                                        ipaddress.IPv4Address(line[0][2])))[0]
+                        # prefix = list(ipaddress.summarize_address_range(ipaddress.IPv4Address(line[0][2]),
+                        # ipaddress.IPv4Address(line[0][3])))[0]
+                        prefix = None
+
                     sgpools.append({"device": "",
                                     "context": "SG",
                                     "name": name,
@@ -65,14 +67,17 @@ def get_pool(ip):
 
 
 def main():
+    # create allpoolsv4.csv MB
     with open(f"../files/allpoolsv4.csv", "a", encoding="utf-8") as csv_file:
         csv_file.write('region,site,device,name,context,pool name,pool,mask,prefix\n')
 
     for region in hosts.keys():
         print(f"Pools getting from {region} is start")
         for host in hosts.get(region):
+            # get pools from SG and Gi contexts
             gipools, sgpools = get_pool(host.get('host'))
 
+            # write Gi pools
             with open(f"../files/allpoolsv4.csv", "a", encoding="utf-8") as csv_file:
                 for pool in gipools:
                     csv_file.write(f"{host.get('region')},,,"
@@ -80,6 +85,7 @@ def main():
                                    f"{str(pool['poolname'])},{str(pool['pool'])},{str(pool['mask'])},"
                                    f"{str(pool['prefix'])}\n")
 
+            # write SG pools
             with open(f"../files/allpoolsv4.csv", "a", encoding="utf-8") as csv_file:
                 for pool in sgpools:
                     csv_file.write(f"{host.get('region')},,,"
